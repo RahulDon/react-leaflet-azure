@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { connect } from "react-redux";
 
-function App() {
+import Header from "./components/header/Header";
+import Dashboard from "./components/dashboard/Dashboard";
+import MapPage from "./components/map/MapPage";
+import PageNotFound from "./components/PageNotFound";
+import Login from "./components/authentication/Login";
+
+export const PrivateRoute = ({ component: Component, ...rest }) => {
+  if (localStorage.getItem("token")) {
+    return <Route {...rest} render={props => <Component {...props} />} />;
+  }
+  return <Redirect to={{ pathname: "/login" }} />;
+};
+
+function App(props) {
+  const { auth } = props;
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      {(auth.token || localStorage.getItem("token")) && <Header />}
+      <Switch>
+        <Route exact path="/login" component={Login} />
+        <PrivateRoute exact path="/" component={Dashboard} />
+        <PrivateRoute exact path="/map" component={MapPage} />
+        <PrivateRoute exact component={PageNotFound} />
+      </Switch>
+    </React.Fragment>
   );
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    auth: state.authReducer.authenticationData
+  };
+}
+
+export default connect(mapStateToProps)(App);
