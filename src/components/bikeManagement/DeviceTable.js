@@ -18,6 +18,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+import Card from "@material-ui/core/Card";
+
 const useStyles = makeStyles({
   table: {
     minWidth: 650
@@ -36,47 +38,50 @@ const StyledTableCell = withStyles(theme =>
   })
 )(TableCell);
 
-const rows = [
+let rows = [
   {
     id: 1,
-    imei_id: 159,
+    imei_no: 159,
     device_model: 6.0,
     description: "Gurgaon dssfd djf sdf ds",
     createdDate: "03-06-1991"
   },
   {
     id: 2,
-    imei_id: 237,
+    imei_no: 237,
     device_model: 9.0,
     description: "dsf sdf jjd jsdfj jhdsjfh jdshf",
     createdDate: "03-06-1991"
   },
   {
     id: 3,
-    imei_id: 262,
+    imei_no: 262,
     device_model: 16.0,
     description: "dsf sdf jjd jsdfj jhdsjfh jdshf",
     createdDate: "03-06-1991"
   },
   {
     id: 4,
-    imei_id: 305,
+    imei_no: 305,
     device_model: 3.7,
     description: "dsf sdf jjd jsdfj jhdsjfh jdshf",
     createdDate: "03-06-1991"
   },
   {
     id: 5,
-    imei_id: 356,
+    imei_no: 356,
     device_model: 16.0,
     description: "dsf sdf jjd jsdfj jhdsjfh jdshf",
     createdDate: "03-06-1991"
   }
 ];
 
-function DeviceTable() {
+function DeviceTable(props) {
+  //console.log("props, ", props);
   const [open, setOpen] = React.useState(false);
   const [deleteModal, setDeleteModal] = React.useState(false);
+
+  rows = props.deviceData;
 
   const editAllocation = () => {
     console.log("Edit Icon");
@@ -123,7 +128,7 @@ function DeviceTable() {
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
-                <TableCell>{row.imei_id}</TableCell>
+                <TableCell>{row.imei_no}</TableCell>
                 <TableCell>{row.device_model}</TableCell>
                 <TableCell>{row.description}</TableCell>
                 <TableCell>{row.createdDate}</TableCell>
@@ -136,7 +141,11 @@ function DeviceTable() {
           </TableBody>
         </Table>
       </TableContainer>
-
+      {rows.length == 0 && (
+        <Card className="blankDataClass">
+          <h2 style={{ color: "#4caf50" }}>No Data Available</h2>
+        </Card>
+      )}
       <div>
         <Dialog
           open={open}
@@ -211,4 +220,4 @@ function DeviceTable() {
   );
 }
 
-export default DeviceTable;
+export default React.memo(DeviceTable);

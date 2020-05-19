@@ -1,13 +1,15 @@
 import React from "react";
 
+import clsx from "clsx";
 import AllocationTable from "./AllocationTable";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import {
-  createMuiTheme,
-  withStyles,
-  makeStyles,
-  createStyles
-} from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
+import * as allocationActions from "../../redux/actions/allocationAction";
+
+import { withStyles, makeStyles, createStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
 import Dialog from "@material-ui/core/Dialog";
@@ -21,7 +23,11 @@ import Select from "@material-ui/core/Select";
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 
-import { green, orange } from "@material-ui/core/colors";
+import { green, red } from "@material-ui/core/colors";
+
+import { orange } from "@material-ui/core/colors";
+
+import { toast } from "react-toastify";
 
 const ColorButton = withStyles(theme => ({
   root: {
@@ -33,50 +39,72 @@ const ColorButton = withStyles(theme => ({
   }
 }))(Button);
 
-const theme = createMuiTheme({
-  palette: {
-    primary: green
-  }
-});
-
 const useStyles = makeStyles(theme =>
   createStyles({
+    root: {
+      display: "flex",
+      alignItems: "center"
+    },
+    wrapper: {
+      margin: theme.spacing(1),
+      position: "relative"
+    },
     formControl: {
       margin: theme.spacing(1),
       minWidth: 120
     },
     selectEmpty: {
       marginTop: theme.spacing(2)
+    },
+    buttonSuccess: {
+      backgroundColor: red[500],
+      "&:hover": {
+        backgroundColor: red[700]
+      }
+    },
+    cancelSuccess: {
+      backgroundColor: green[500],
+      "&:hover": {
+        backgroundColor: green[700]
+      }
+    },
+    buttonProgress: {
+      color: green[500],
+      position: "absolute",
+      top: "50%",
+      left: "20%",
+      marginTop: -12,
+      marginLeft: -12
+    },
+    cancelButtonProgress: {
+      color: red[500],
+      position: "absolute",
+      top: "50%",
+      left: "70%",
+      marginTop: -12,
+      marginLeft: -12
     }
   })
 );
 
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium
-  };
-}
-
-function Allocation() {
+function Allocation(props) {
+  const { actions } = props;
   const [open, setOpen] = React.useState(false);
 
-  const [vehicalName, setVehicalName] = React.useState([]);
-  const [deviceName, setDeviceName] = React.useState([]);
-  const [cityName, setCityName] = React.useState([]);
+  const [vehicalData, setVehicalData] = React.useState([]);
+  const [deviceData, setDeviceData] = React.useState([]);
+  const [cityData, setCityData] = React.useState([]);
 
-  const handleVehicalChange = event => {
-    setVehicalName(event.target.value);
+  const handleVehicalChange = e => {
+    setVehicalData(e.target.value);
   };
 
   const handleDeviceChange = event => {
-    setDeviceName(event.target.value);
+    setDeviceData(event.target.value);
   };
 
   const handleCityChange = event => {
-    setCityName(event.target.value);
+    setCityData(event.target.value);
   };
 
   const handleClickOpen = () => {
@@ -100,44 +128,50 @@ function Allocation() {
   };
 
   const vehical = [
-    "TVS Apache RTR 160",
-    "TVS Apache RTR 160 4V",
-    "TVS Apache RR 310",
-    "TVS Jupiter",
-    "TVS XL100",
-    "TVS Apache RTR 180",
-    "TVS Apache RTR 200 4V",
-    "TVS Scooty Pep Plus",
-    "TVS iQube Electric",
-    "TVS NTORQ 125"
+    { id: 1, name: "TVS Apache RTR 160" },
+    { id: 2, name: "TVS Apache RTR 160 4V" },
+    { id: 3, name: "TVS Apache RR 310" },
+    { id: 4, name: "TVS Jupiter" },
+    { id: 5, name: "TVS XL100" }
   ];
 
   const device = [
-    "Light sensor",
-    "Fuel pressure sensor",
-    "Fuel level sensor",
-    "Mass airflow sensor",
-    "Oil level sensor",
-    "Oil pressure sensor",
-    "Parking sensor",
-    "Radar sensor",
-    "Speed sensor",
-    "Throttle position sensor"
+    { id: 1, name: "Light sensor" },
+    { id: 2, name: "Fuel pressure sensor" },
+    { id: 3, name: "Fuel level sensor" },
+    { id: 4, name: "Mass airflow sensor" },
+    { id: 5, name: "Oil level sensor" }
   ];
 
   const city = [
-    "Faridabad",
-    "Gurugram",
-    "Panipat",
-    "Ambala",
-    "Yamunanagar",
-    "Rohtak",
-    "Hisar",
-    "Karnal",
-    "Sonipat",
-    "Panchkula"
+    { id: 1, name: "Faridabad" },
+    { id: 2, name: "Gurugram" },
+    { id: 3, name: "Panipat" },
+    { id: 4, name: "Ambala" },
+    { id: 5, name: "Yamunanagar" }
   ];
   const classes = useStyles();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    let data = {
+      bikeId: vehicalData,
+      imie_id: deviceData,
+      city: cityData
+    };
+    await actions.saveAllocation(data);
+    toast.success("Data saved succesfully.");
+    handleClose();
+  }
+
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]: props.apiCallStatus
+  });
+
+  const cancelButtonClassname = clsx({
+    [classes.cancelSuccess]: props.apiCallStatus
+  });
+
   return (
     <div>
       <ColorButton
@@ -153,7 +187,7 @@ function Allocation() {
         Allocation Management
       </h4>
       <div className="dashboardTable">
-        <AllocationTable />
+        <AllocationTable allocationData={props.allocationData} />
       </div>
 
       <div>
@@ -163,85 +197,133 @@ function Allocation() {
           aria-labelledby="form-dialog-title"
         >
           <DialogTitle id="form-dialog-title">New Allocation</DialogTitle>
-          <DialogContent>
-            <FormControl className={classes.formControl}>
-              <InputLabel id="vehical">Vehical</InputLabel>
-              <Select
-                labelId="vehical"
-                id="demo-mutiple-name"
-                value={vehicalName}
-                onChange={handleVehicalChange}
-                input={<Input />}
-                MenuProps={MenuProps}
-              >
-                {vehical.map(name => (
-                  <MenuItem
-                    key={name}
-                    value={name}
-                    style={getStyles(name, vehicalName, theme)}
-                  >
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          <form noValidate onSubmit={e => handleSubmit(e)}>
+            <DialogContent>
+              <FormControl className={classes.formControl}>
+                <InputLabel id="vehical">Vehical</InputLabel>
+                <Select
+                  labelId="vehical"
+                  id="vehical"
+                  value={vehicalData || ""}
+                  onChange={handleVehicalChange}
+                  input={<Input />}
+                  MenuProps={MenuProps}
+                >
+                  {vehical.map(obj => (
+                    <MenuItem
+                      key={obj.id}
+                      value={obj.name}
+                      // style={getStyles(obj.name, vehicalData, theme)}
+                    >
+                      {obj.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <FormControl className={classes.formControl}>
-              <InputLabel id="device">Device</InputLabel>
-              <Select
-                labelId="device"
-                id="demo-mutiple-name"
-                value={deviceName}
-                onChange={handleDeviceChange}
-                input={<Input />}
-                MenuProps={MenuProps}
-              >
-                {device.map(name => (
-                  <MenuItem
-                    key={name}
-                    value={name}
-                    style={getStyles(name, deviceName, theme)}
-                  >
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              <FormControl className={classes.formControl}>
+                <InputLabel id="device">Device</InputLabel>
+                <Select
+                  labelId="device"
+                  id="device"
+                  value={deviceData || ""}
+                  onChange={handleDeviceChange}
+                  input={<Input />}
+                  MenuProps={MenuProps}
+                >
+                  {device.map(obj => (
+                    <MenuItem
+                      key={obj.id}
+                      value={obj.name}
+                      // style={getStyles(obj.name, deviceData, theme)}
+                    >
+                      {obj.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <FormControl className={classes.formControl}>
-              <InputLabel id="city">City</InputLabel>
-              <Select
-                labelId="city"
-                id="demo-mutiple-name"
-                value={cityName}
-                onChange={handleCityChange}
-                input={<Input />}
-                MenuProps={MenuProps}
-              >
-                {city.map(name => (
-                  <MenuItem
-                    key={name}
-                    value={name}
-                    style={getStyles(name, cityName, theme)}
-                  >
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="outlined" color="primary" onClick={handleClose}>
-              Save
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={handleClose}>
-              Cancel
-            </Button>
-          </DialogActions>
+              <FormControl className={classes.formControl}>
+                <InputLabel id="city">City</InputLabel>
+                <Select
+                  labelId="city"
+                  id="city"
+                  value={cityData || ""}
+                  onChange={handleCityChange}
+                  input={<Input />}
+                  MenuProps={MenuProps}
+                >
+                  {city.map(obj => (
+                    <MenuItem
+                      key={obj.id}
+                      value={obj.name}
+                      // style={getStyles(obj.name, cityData, theme)}
+                    >
+                      {obj.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </DialogContent>
+            <DialogActions>
+              <div className={classes.wrapper}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={props.apiCallStatus}
+                  className={buttonClassname}
+                  style={{ marginRight: "10px" }}
+                >
+                  Save
+                </Button>
+                {props.apiCallStatus && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.buttonProgress}
+                  />
+                )}
+
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  disabled={props.apiCallStatus}
+                  className={cancelButtonClassname}
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+                {props.apiCallStatus && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.cancelButtonProgress}
+                  />
+                )}
+              </div>
+            </DialogActions>
+          </form>
         </Dialog>
       </div>
     </div>
   );
 }
 
-export default Allocation;
+function mapStateToProps(state) {
+  return {
+    allocationData: state.allocationReducer.allocationData,
+    apiCallStatus: state.apiCallStatusReducer.apiCallSuccess
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: {
+      saveAllocation: bindActionCreators(
+        allocationActions.saveAllocation,
+        dispatch
+      )
+    }
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Allocation);

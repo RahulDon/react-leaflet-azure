@@ -9,6 +9,9 @@ import MapPage from "./components/map/MapPage";
 import PageNotFound from "./components/PageNotFound";
 import Login from "./components/authentication/Login";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export const PrivateRoute = ({ component: Component, ...rest }) => {
   if (localStorage.getItem("token")) {
     return <Route {...rest} render={props => <Component {...props} />} />;
@@ -27,6 +30,7 @@ function App(props) {
         <PrivateRoute exact path="/map" component={MapPage} />
         <PrivateRoute exact component={PageNotFound} />
       </Switch>
+      <ToastContainer autoClose={2000} hideProgressBar />
     </React.Fragment>
   );
 }

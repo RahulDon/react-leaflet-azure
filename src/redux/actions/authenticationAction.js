@@ -1,5 +1,10 @@
 import * as types from "./actionTypes";
-import { beginApiCall, apiCallError } from "./apiStatusAction";
+import {
+  beginApiCall,
+  stopApiCall,
+  apiCallError,
+  delay
+} from "./apiStatusAction";
 import { v4 as uuidv4 } from "uuid";
 
 export function loginSuccess(authData) {
@@ -18,7 +23,9 @@ export function login(loginData) {
       token: uuidv4()
     };
 
+    await delay(3000);
     await dispatch(loginSuccess(authData));
+    await dispatch(stopApiCall());
 
     //dispatch(apiCallError(authData));
   };

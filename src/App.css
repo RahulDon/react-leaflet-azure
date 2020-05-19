@@ -45,6 +45,7 @@
 
 .dashboardTable {
   margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .mapBody {
@@ -72,4 +73,10 @@
 
 .bikeHeading {
   float: left;
+}
+
+.blankDataClass {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
 }

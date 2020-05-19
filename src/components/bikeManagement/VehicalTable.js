@@ -18,6 +18,8 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+import Card from "@material-ui/core/Card";
+
 const useStyles = makeStyles({
   table: {
     minWidth: 650
@@ -36,7 +38,7 @@ const StyledTableCell = withStyles(theme =>
   })
 )(TableCell);
 
-const rows = [
+let rows = [
   {
     id: 1,
     vehicalType: "Two wheeler",
@@ -74,9 +76,11 @@ const rows = [
   }
 ];
 
-function VehicalTable() {
+function VehicalTable(props) {
   const [open, setOpen] = React.useState(false);
   const [deleteModal, setDeleteModal] = React.useState(false);
+
+  rows = props.vehicalData;
 
   const editAllocation = () => {
     console.log("Edit Icon");
@@ -136,6 +140,11 @@ function VehicalTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {rows.length == 0 && (
+        <Card className="blankDataClass">
+          <h2 style={{ color: "#0063cc" }}>No Data Available</h2>
+        </Card>
+      )}
 
       <div>
         <Dialog

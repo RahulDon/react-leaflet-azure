@@ -18,8 +18,13 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+import Card from "@material-ui/core/Card";
+
 const useStyles = makeStyles({
   table: {
+    minWidth: 650
+  },
+  root: {
     minWidth: 650
   }
 });
@@ -36,7 +41,7 @@ const StyledTableCell = withStyles(theme =>
   })
 )(TableCell);
 
-const rows = [
+let rows = [
   { id: 1, bikeId: 159, imie_id: 6.0, city: "Gurgaon", status: "Active" },
   { id: 2, bikeId: 237, imie_id: 9.0, city: "Gurgaon", status: "Active" },
   { id: 3, bikeId: 262, imie_id: 16.0, city: "Gurgaon", status: "Active" },
@@ -44,9 +49,11 @@ const rows = [
   { id: 5, bikeId: 356, imie_id: 16.0, city: "Gurgaon", status: "Active" }
 ];
 
-function AllocationTable() {
+function AllocationTable(props) {
   const [open, setOpen] = React.useState(false);
   const [deleteModal, setDeleteModal] = React.useState(false);
+
+  rows = props.allocationData;
 
   const editAllocation = () => {
     console.log("Edit Icon");
@@ -106,6 +113,11 @@ function AllocationTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {rows.length === 0 && (
+        <Card className="blankDataClass">
+          <h2 style={{ color: "#9c27b0" }}>No Data Available</h2>
+        </Card>
+      )}
       <div>
         <Dialog
           open={open}
@@ -180,4 +192,4 @@ function AllocationTable() {
   );
 }
 
-export default AllocationTable;
+export default React.memo(AllocationTable);

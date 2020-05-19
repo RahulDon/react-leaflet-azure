@@ -11,9 +11,6 @@ export default function dashboardReducer(state = initialState, action) {
   //let newState = Object.assign(state, {});
   //let newState = state;
   switch (action.type) {
-    case types.CREATE_NEW_ALLOCATION:
-      return action.new_allocation;
-
     case types.SHOW_MAP_ICON:
       newState.showMapIcon = true;
       return newState;

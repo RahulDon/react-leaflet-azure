@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import clsx from "clsx";
+
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -20,9 +23,17 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../../assets/harley-davidson-zGzXsJUBQfs-unsplash.jpg";
 
+import { green, red } from "@material-ui/core/colors";
+
+import { toast } from "react-toastify";
+
 const useStyles = makeStyles(theme => ({
   root: {
     height: "100vh"
+  },
+  wrapper: {
+    margin: theme.spacing(1),
+    position: "relative"
   },
   image: {
     backgroundImage: logo,
@@ -50,6 +61,14 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2)
+  },
+  buttonProgress: {
+    color: green[500],
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12
   }
 }));
 
@@ -57,11 +76,22 @@ function Login(props) {
   const { actions } = props;
   let history = useHistory();
   const [state, setState] = useState({ email: "", password: "" });
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await actions.login(state);
-    history.push("/");
+    if (state.email === "") {
+      setEmailError(true);
+    }
+    if (state.password === "") {
+      setPasswordError(true);
+    }
+    if (state.email !== "" && state.password !== "") {
+      await actions.login(state);
+      toast.success("Login succesfully.");
+      history.push("/");
+    }
   }
 
   const classes = useStyles();
@@ -69,8 +99,15 @@ function Login(props) {
   const changeField = e => {
     //setState({ ...state, [e.target.name]: e.target.value }); //Microsoft edge does not support spread operator
     const newState = Object.assign(state, { [e.target.name]: e.target.value });
+    setEmailError(false);
+    setPasswordError(false);
     setState(newState);
   };
+
+  const buttonClassname = clsx({
+    [classes.buttonSuccess]: props.apiCallStatus
+  });
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -99,6 +136,8 @@ function Login(props) {
               autoComplete="email"
               autoFocus
               onChange={e => changeField(e)}
+              error={emailError}
+              helperText={emailError ? "Email is Required!" : " "}
             />
             <TextField
               variant="outlined"
@@ -111,37 +150,55 @@ function Login(props) {
               id="password"
               autoComplete="current-password"
               onChange={e => changeField(e)}
+              error={passwordError}
+              helperText={passwordError ? "Password is Required!" : " "}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              Log In
-            </Button>
-            <Grid container>
+            <div className={classes.wrapper}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                fullWidth
+                disabled={props.apiCallStatus}
+                className={buttonClassname}
+              >
+                Save
+              </Button>
+              {props.apiCallStatus && (
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </div>
+            {/* <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
               </Grid>
-              {/* <Grid item>
+              <Grid item>
                 <Link href="#" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
-              </Grid> */}
-            </Grid>
+              </Grid>
+            </Grid> */}
           </form>
         </div>
       </Grid>
     </Grid>
   );
+}
+
+function mapStateToProps(state) {
+  return {
+    loginSuccessData: state.authReducer.authenticationData,
+    apiCallStatus: state.apiCallStatusReducer.apiCallSuccess
+  };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -152,4 +209,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

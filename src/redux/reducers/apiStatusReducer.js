@@ -14,6 +14,9 @@ export default function apiCallStatusReducer(state = initialState, action) {
     case types.BEGIN_API_CALL:
       newState.apiCallSuccess = true;
       return newState;
+    case types.STOP_API_CALL:
+      newState.apiCallSuccess = false;
+      return newState;
     case types.API_CALL_ERROR:
       newState.apiCallFailure = true;
       return newState;
