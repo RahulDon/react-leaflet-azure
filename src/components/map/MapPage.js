@@ -1,59 +1,244 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import ReactDOM from "react-dom";
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-import { carSenorsDatas } from "../../dummyData/dummySensorData";
+import _ from "lodash";
+import L from "leaflet";
+import mapImg from "../../assets/motorbike.png";
+let myIcon = L.icon({
+  iconUrl: mapImg,
+  iconSize: [50, 50],
+  iconAnchor: [12.5, 41],
+  popupAnchor: [0, -41]
+});
 
-function MapPage() {
-  const [cars, setCars] = useState(null);
-  useEffect(() => {
-    // fetch(
-    //   `https://developer.nrel.gov/api/alt-fuel-stations/v1/nearest.json?api_key=DHmL7ezZEbesjbXp3yu9wnbTiPyQWNpN84AdmFUv&location=Denver+CO`
-    // )
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     setCrime(data);
-    //   });
-    setCars(carSenorsDatas());
-  }, []);
-  const [activePark, setActivePark] = useState(null);
-  return (
-    <>
-      {cars ? (
-        <Map className="map" center={[cars.latitude, cars.longitude]} zoom={17}>
-          <TileLayer
-            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+export default class MapPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      carSenorsData: {
+        features: [
+          {
+            properties: {
+              id: 1
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Pessenger Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.740566,
+            long: -104.983613
+          },
+          {
+            properties: {
+              id: 2
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Bike Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.738653,
+            long: -104.982058
+          },
+          {
+            properties: {
+              id: 3
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Sports Bike Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.738183,
+            long: -104.988195
+          },
+          {
+            properties: {
+              id: 4
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Pulsor Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.736806,
+            long: -104.986135
+          },
+          {
+            properties: {
+              id: 5
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Apache Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.737177,
+            long: -104.982626
+          },
+          {
+            properties: {
+              id: 6
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Himalya Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.736608,
+            long: -104.982616
+          },
+          {
+            properties: {
+              id: 7
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Splender Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.740022,
+            long: -104.982315
+          },
+          {
+            properties: {
+              id: 8
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "TVS Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.737894,
+            long: -104.978667
+          },
+          {
+            properties: {
+              id: 9
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "Bmw Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.739181,
+            long: -104.983538
+          },
+          {
+            properties: {
+              id: 10
+            },
+            sensorData: [
+              {
+                sensor_id: 1,
+                title: "R15 Occupancy Sensor",
+                description: "",
+                Car_ID: 960
+              }
+            ],
+            lat: 39.73923,
+            long: -104.990233
+          }
+        ]
+      },
+      activePark: null
+    };
+  }
+  counter() {
+    const that = this;
+    function timer() {
+      //clone
+      const copy = _.cloneDeep(that.state.carSenorsData);
+
+      for (let i = 0; i < that.state.carSenorsData.features.length; i++) {
+        let currentLatValue = that.state.carSenorsData.features[i].lat;
+        let currentLongValue = that.state.carSenorsData.features[i].long;
+
+        currentLatValue -= 0.0001;
+        currentLongValue -= 0.0001;
+
+        copy.features[i].lat = currentLatValue;
+        copy.features[i].long = currentLongValue;
+      }
+      that.setState({
+        carSenorsData: copy
+      });
+    }
+    setInterval(timer, 1000);
+  }
+  componentDidMount() {
+    this.counter();
+  }
+  render() {
+    return (
+      <Map
+        className="map"
+        center={[
+          this.state.carSenorsData.features[0].lat,
+          this.state.carSenorsData.features[0].long
+        ]}
+        zoom={15}
+      >
+        <TileLayer
+          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {this.state.carSenorsData.features.map(bike => (
+          <Marker
+            key={bike.properties.id}
+            onClick={() => {
+              this.setState({ activePark: bike });
+            }}
+            position={[bike.lat, bike.long]}
+            icon={myIcon}
           />
+        ))}
 
-          {cars.features.map(park => (
-            <Marker
-              key={park.properties.PARK_ID}
-              position={park.geometry.coordinates}
-              onClick={() => {
-                setActivePark(park);
-              }}
-              icon={park.properties.myIcon}
-            />
-          ))}
-
-          {activePark && (
-            <Popup
-              position={activePark.geometry.coordinates}
-              onClose={() => {
-                setActivePark(null);
-              }}
-            >
-              <h2>List of sensors used in this car</h2>
-              {activePark.properties.sensorData.map(sensor => (
-                <div key={sensor.sensor_id}>
-                  <h5>{sensor.title}</h5>
-                </div>
-              ))}
-            </Popup>
-          )}
-        </Map>
-      ) : null}
-    </>
-  );
+        {this.state.activePark && (
+          <Popup
+            position={[this.state.activePark.lat, this.state.activePark.long]}
+            onClose={() => {
+              this.setState({ activePark: false });
+            }}
+          >
+            <h2>List of sensors used in this car</h2>
+            {this.state.activePark.sensorData.map(sensor => (
+              <div key={sensor.sensor_id}>
+                <h5>{sensor.title}</h5>
+              </div>
+            ))}
+          </Popup>
+        )}
+      </Map>
+    );
+  }
 }
-
-export default MapPage;
